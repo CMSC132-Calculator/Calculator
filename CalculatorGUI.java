@@ -1,5 +1,6 @@
 package calculator;
 
+
 import javafx.application.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,6 +16,9 @@ import javafx.scene.layout.*;
 
 @SuppressWarnings("restriction")
 public class CalculatorGUI extends Application {
+
+	// Calculator display
+	private TextArea displayArea;
 
 	// String representing the number that will be displayed by the calculator
 	private String displayNumber = "";
@@ -67,7 +71,7 @@ public class CalculatorGUI extends Application {
 		public void operatorHit(Operator operator) {
 			// IMPLEMENT
 		}
-		
+
 		public void reset() {
 			secondValue = 0;
 			displayNumber = "";
@@ -80,11 +84,11 @@ public class CalculatorGUI extends Application {
 			// IMPLEMENT
 			// IMPLEMENT
 		}
-		
+
 		public void operatorHit(Operator operator) {
 			// IMPLEMENT
 		}
-		
+
 		public void reset() {
 			// IMPLEMENT
 		}
@@ -94,7 +98,7 @@ public class CalculatorGUI extends Application {
 		currentState.updateNumber(button.getValue());
 
 	}
-	
+
 	private void resetAll() {
 		currentState = readingFirst;
 		displayNumber = "";
@@ -113,11 +117,13 @@ public class CalculatorGUI extends Application {
 		int paneBorderTop = 10, paneBorderRight = 20;  // top and right border
 		int paneBorderBottom = 10, paneBorderLeft = 20; // left / bottom border
 
-		int fieldPaneBorderBottom = 0;
+		// parameters for the entire root BorderPane
+		int rootBorderTop = 0, rootBorderRight = 0;  // top and right border
+		int rootBorderBottom = 0, rootBorderLeft = -130; // left/bottom border
 
 		// TextArea for the calculator display
 
-		TextArea displayArea = new TextArea(); 
+		displayArea = new TextArea(); 
 		displayArea.setEditable(false);
 		displayArea.setWrapText(true);
 		displayArea.setMaxHeight(50);
@@ -129,6 +135,8 @@ public class CalculatorGUI extends Application {
 		screen.getChildren().add(displayArea);
 		screen.setAlignment(Pos.TOP_CENTER);
 
+		/* BUTTON CREATION */
+		
 		/* Creating an HBox to contain the top row of calculator buttons*/
 
 		HBox topButtonsPane = new HBox(spaceBetweenNodes);
@@ -157,6 +165,7 @@ public class CalculatorGUI extends Application {
 		HBox sevenEightNinePane = new HBox(spaceBetweenNodes);
 		sevenEightNinePane.setAlignment(Pos.BOTTOM_CENTER);
 
+
 		sevenEightNinePane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
 				paneBorderBottom, paneBorderLeft));
 
@@ -164,12 +173,15 @@ public class CalculatorGUI extends Application {
 
 		Button sevenButton = new NumberButton("7", 7);
 		sevenEightNinePane.getChildren().add(sevenButton);
+		sevenButton.setOnAction(new NumberButtonHandler());
 
 		Button eightButton = new NumberButton("8", 8);
 		sevenEightNinePane.getChildren().add(eightButton);
+		eightButton.setOnAction(new NumberButtonHandler());
 
 		Button nineButton = new NumberButton("9", 9);
 		sevenEightNinePane.getChildren().add(nineButton);
+		nineButton.setOnAction(new NumberButtonHandler());
 
 		Button timesButton = new Button("x");
 		sevenEightNinePane.getChildren().add(timesButton);
@@ -187,12 +199,15 @@ public class CalculatorGUI extends Application {
 
 		Button fourButton = new NumberButton("4", 4);
 		fourFiveSixPane.getChildren().add(fourButton);
+		fourButton.setOnAction(new NumberButtonHandler());
 
 		Button fiveButton = new NumberButton("5", 5);
 		fourFiveSixPane.getChildren().add(fiveButton);
+		fiveButton.setOnAction(new NumberButtonHandler());
 
 		Button sixButton = new NumberButton("6", 6);
 		fourFiveSixPane.getChildren().add(sixButton);
+		sixButton.setOnAction(new NumberButtonHandler());
 
 		Button minusButton = new Button("-");
 		fourFiveSixPane.getChildren().add(minusButton);
@@ -209,12 +224,15 @@ public class CalculatorGUI extends Application {
 
 		Button oneButton = new NumberButton("1", 1);
 		oneTwoThreePane.getChildren().add(oneButton);
+		oneButton.setOnAction(new NumberButtonHandler());
 
 		Button twoButton = new NumberButton("2", 2);
 		oneTwoThreePane.getChildren().add(twoButton);
+		twoButton.setOnAction(new NumberButtonHandler());
 
 		Button threeButton = new NumberButton("3", 3);
 		oneTwoThreePane.getChildren().add(threeButton);
+		threeButton.setOnAction(new NumberButtonHandler());
 
 		Button plusButton = new Button("+");
 		oneTwoThreePane.getChildren().add(plusButton);
@@ -234,6 +252,7 @@ public class CalculatorGUI extends Application {
 
 		Button zeroButton = new NumberButton("0", 0);
 		zeroAndDotPane.getChildren().add(zeroButton);
+		zeroButton.setOnAction(new NumberButtonHandler());
 
 		Button dotButton = new Button(".");
 		zeroAndDotPane.getChildren().add(dotButton);
@@ -241,76 +260,8 @@ public class CalculatorGUI extends Application {
 		Button equalsButton = new Button("=");
 		zeroAndDotPane.getChildren().add(equalsButton);
 
-		// Creating vBox to hold the rows of buttons
-
-		VBox numberInputPane = new VBox();
-		numberInputPane.getChildren().addAll(topButtonsPane, sevenEightNinePane,
-				fourFiveSixPane,oneTwoThreePane, zeroAndDotPane);
-
-		// A BorderPane is created to hold all the GUI elements
-		BorderPane root = new BorderPane();
-		root.setPadding(new Insets(0,-0,-0,-130));
-		root.setRight(null);
-		root.setLeft(null);
-
-		/* BUTTON HANDLERS BELOW */
-
-		/* When each NumberButton is pressed, it will be processed by the
-		 * process function defined above. The display area will then be
-		 * updated with the current display number
-		 */
-
-
-		zeroButton.setOnAction(e -> {
-			processNumber((NumberButton)zeroButton);
-			displayArea.setText(displayNumber);
-		});
-
-		oneButton.setOnAction(e -> {
-			processNumber((NumberButton)oneButton);
-			displayArea.setText(displayNumber);
-		});
-
-		twoButton.setOnAction(e -> {
-			processNumber((NumberButton)twoButton);
-			displayArea.setText(displayNumber);
-		});
-
-		threeButton.setOnAction(e -> {
-			processNumber((NumberButton)threeButton);
-			displayArea.setText(displayNumber);
-		});
-
-		fourButton.setOnAction(e -> {
-			processNumber((NumberButton)fourButton);
-			displayArea.setText(displayNumber);
-		});
-
-		fiveButton.setOnAction(e -> {
-			processNumber((NumberButton)fiveButton);
-			displayArea.setText(displayNumber);
-		});
-
-		sixButton.setOnAction(e -> {
-			processNumber((NumberButton)sixButton);
-			displayArea.setText(displayNumber);
-		});
-
-		sevenButton.setOnAction(e -> {
-			processNumber((NumberButton)sevenButton);
-			displayArea.setText(displayNumber);
-		});
-
-		eightButton.setOnAction(e -> {
-			processNumber((NumberButton)eightButton);
-			displayArea.setText(displayNumber);
-		});
-
-		nineButton.setOnAction(e -> {
-			processNumber((NumberButton)nineButton);
-			displayArea.setText(displayNumber);
-		});
-
+		/* BUTTON HANDLERS */
+		
 		/* Button handlers for the operand buttons are found below. Each button
 		 * simply calls the operatorHit method in the current state
 		 */
@@ -332,38 +283,51 @@ public class CalculatorGUI extends Application {
 		});
 
 		/* Handler for the dot button */
-		
+
 		dotButton.setOnAction(e -> {
 			displayNumber += ".";
 			displayArea.setText(displayNumber);
 		});
-		
-		/*Handler for */
-		
+
+		/*Handler for Inverse and SquareRoot buttons */
+
 		inverseButton.setOnAction(e -> {
 			float newNumber = 1f / (Float.parseFloat(displayNumber));
 			displayNumber = Float.toString(newNumber);
 			displayArea.setText(displayNumber);
 		});
-		
+
 		squareRootButton.setOnAction(e -> {
 			double current = (Float.parseFloat(displayNumber));
 			double newNumber = Math.sqrt(current);
 			displayNumber = Double.toString(newNumber);
 			displayArea.setText(displayNumber);
 		});
-		
-		 /* Clear and Clear Entry button handlers */
-		
+
+		/* Clear and Clear Entry button handlers */
+
 		clearButton.setOnAction(e -> {
 			currentState.reset();
 			displayArea.setText(displayNumber);
 		});
-		
+
 		clearEntryButton.setOnAction(e -> {
 			resetAll();
 			displayArea.setText(displayNumber);
 		});
+
+		// Creating vBox to hold the rows of buttons
+		VBox numberInputPane = new VBox();
+		numberInputPane.getChildren().addAll(topButtonsPane, sevenEightNinePane,
+				fourFiveSixPane,oneTwoThreePane, zeroAndDotPane);
+
+
+		// A BorderPane is created to hold all the GUI elements
+		BorderPane root = new BorderPane();
+		root.setPadding(new Insets(rootBorderTop,rootBorderRight,
+				rootBorderBottom,rootBorderLeft));
+		root.setRight(null);
+		root.setLeft(null);
 
 		/* Display the stage */
 		root.setTop(screen);
@@ -377,6 +341,16 @@ public class CalculatorGUI extends Application {
 
 		primaryStage.setResizable(false); /* prevents stage resizing */
 		primaryStage.show();
+	}
+
+	/* Handler for all Number Buttons */
+
+	private class NumberButtonHandler implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent e) {
+			processNumber((NumberButton)e.getSource());
+			displayArea.setText(displayNumber);
+		}
 	}
 
 	public static void main(String[] args) {

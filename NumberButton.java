@@ -1,7 +1,6 @@
 package calculator;
 
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+
 import javafx.scene.control.Button;
 
 public class NumberButton extends Button {
