@@ -65,11 +65,49 @@ public class CalculatorGUI extends Application {
 	public class ReadingSecondState implements CalcState {
 		@Override
 		public void updateNumber(int buttonNumber) {
-			// IMPLEMENT
+			displayNumber += buttonNumber;
 		}
 
 		public void operatorHit(Operator operator) {
-			// IMPLEMENT
+			float ans = 0;
+			try {
+				secondValue = Float.parseFloat(displayNumber);
+				System.out.print("second element state "); //FOR TESTING
+				System.out.println(secondValue); // FOR TESTING
+				if(operator.equals(Operator.EQUAL))
+				{
+					switch(currentOperator)
+					{
+					case DIVIDE: ans = firstValue / secondValue;
+					break;
+					case ADD: ans = firstValue + secondValue;
+					break;
+					case SUBTRACT: ans = firstValue - secondValue;
+					break;
+					case MULTIPLY: ans = firstValue * secondValue;
+					break;
+					default:
+					break;
+					}
+				}
+				System.out.println("after calc state "); //FOR TESTING
+				
+				Integer whole = 0;
+				if (ans % 1 == 0) // trying to drop decimal if ans is whole number
+				{
+					whole = (int) ans;
+					displayNumber = Integer.toString(whole);
+				}
+				else
+					displayNumber = Float.toString(ans);
+				
+				System.out.println(displayNumber); //Test
+				displayArea.setText(displayNumber);
+				
+			} catch (NumberFormatException e) { // multiple decimal points
+				currentState = error; 
+				System.out.print("error"); // FOR TESTING
+			}
 		}
 
 		public void reset() {
@@ -77,6 +115,7 @@ public class CalculatorGUI extends Application {
 			displayNumber = "";
 		}
 	}
+
 
 	public class ErrorState implements CalcState { // IMPLEMENT
 		@Override
