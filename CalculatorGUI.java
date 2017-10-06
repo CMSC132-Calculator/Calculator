@@ -49,6 +49,7 @@ public class CalculatorGUI extends Application {
 				firstValue = Float.parseFloat(displayNumber);
 				currentOperator = operator;
 				currentState = readingSecond;
+				displayNumber = ""; //reset display for 2nd operand
 				System.out.print("second state"); //FOR TESTING
 				System.out.print(firstValue); // FOR TESTING
 			} catch (NumberFormatException e) { // multiple decimal points
