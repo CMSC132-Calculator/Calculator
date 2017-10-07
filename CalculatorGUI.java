@@ -51,7 +51,7 @@ public class CalculatorGUI extends Application {
 				currentOperator = operator;
 				currentState = readingSecond;
 				displayNumber = ""; // reset display for 2nd operand
-				
+
 				System.out.print("First Value Is: "); // FOR TESTING
 				System.out.println(firstValue); // FOR TESTING
 			} catch (NumberFormatException e) { // Multiple Decimal Point Error
@@ -77,7 +77,7 @@ public class CalculatorGUI extends Application {
 		public void operatorHit(Operator operator) {
 			try {
 				secondValue = Float.parseFloat(displayNumber);
-		
+
 				//If equals operand is hit 
 				if (operator.equals(Operator.EQUAL)) {
 					switch (currentOperator) {
@@ -104,16 +104,16 @@ public class CalculatorGUI extends Application {
 					displayNumber = Float.toString(answer);
 					displayArea.setText(displayNumber);
 					currentState = readingFirst;
-					
+
 					System.out.print("The Final Answer Is: "); // FOR TESTING
 					System.out.println(displayNumber); // Test
-					
+
 				} else {
 					/*If any other operand is hit, current value is stored in
 					 * the first value variable. The state is then reset again
 					 * to the second state. This continues UNTIL the equals
 					 * operand is pressed
-					*/
+					 */
 					switch (currentOperator) {
 					case DIVIDE:
 						if (secondValue == 0) {
@@ -134,14 +134,14 @@ public class CalculatorGUI extends Application {
 					default:
 						break;
 					}
-					
+
 					currentOperator = operator;
 					currentState = readingSecond; //Reset back to start of 2nd 
 					displayNumber = ""; // reset display for next operand
-					
+
 					System.out.print("The Current Value Is: "); // FOR TESTING
 					System.out.println(firstValue); // Test
-					
+
 
 				}
 
@@ -382,17 +382,61 @@ public class CalculatorGUI extends Application {
 
 		/* Handler for Inverse and SquareRoot buttons */
 
+		/* The inverseButton handler simply returns the inverse of the
+		 * current display number. The handler will display the error status if
+		 * this button is pressed when there is no current number, or if the
+		 * current number is zero
+		 */
+
 		inverseButton.setOnAction(e -> {
-			float newNumber = 1f / (Float.parseFloat(displayNumber));
-			displayNumber = Float.toString(newNumber);
-			displayArea.setText(displayNumber);
+
+			if (displayNumber.equals("")) { // if there is no number
+				currentState = error; // display error
+				currentState.updateNumber(0);
+			} else { // there is a number 
+				try { // considers if the number is valid
+					double current = (Float.parseFloat(displayNumber));
+					if (current == 0) { // display error if number is zero
+						currentState = error;
+						currentState.updateNumber(0);
+					} else { // number is not zero, calculate inverse
+						float newNumber = 1f / (Float.parseFloat(displayNumber));
+						displayNumber = Float.toString(newNumber);
+						displayArea.setText(displayNumber);
+					}
+				} catch (NumberFormatException multipleDecimals) { 
+					currentState = error; // multiple decimals, invalid number
+					currentState.updateNumber(0);
+				}
+			}
 		});
 
+		/* The squareRootButton handler simply returns the square root of the
+		 * current display number. The handler will display the error status if
+		 * this button is pressed when there is no current number, or if the
+		 * current number is negative
+		 */
+
 		squareRootButton.setOnAction(e -> {
-			double current = (Float.parseFloat(displayNumber));
-			double newNumber = Math.sqrt(current);
-			displayNumber = Double.toString(newNumber);
-			displayArea.setText(displayNumber);
+			if (displayNumber.equals("")) { // if there is no number
+				currentState = error; // display error
+				currentState.updateNumber(0);
+			} else { // there is a number displayed
+				try { // considers if the number is valid
+					double current = (Float.parseFloat(displayNumber));
+					if (current < 0) { // display error if negative number
+						currentState = error;
+						currentState.updateNumber(0);
+					} else { // calculate the square root
+						double newNumber = Math.sqrt(current);
+						displayNumber = Double.toString(newNumber);
+						displayArea.setText(displayNumber);
+					}
+				} catch (NumberFormatException multipleDecimals) { 
+					currentState = error; // multiple decimals, invalid number
+					currentState.updateNumber(0);
+				}
+			}
 		});
 
 		/* Clear and Clear Entry button handlers */
