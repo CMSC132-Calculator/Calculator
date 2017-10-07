@@ -1,6 +1,5 @@
 package calculator;
 
-
 import javafx.application.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,16 +14,17 @@ import javafx.stage.*;
 import javafx.scene.layout.*;
 
 @SuppressWarnings("restriction")
+
 public class CalculatorGUI extends Application {
 
-	// Calculator display
+	// Calculator display screen
 	private TextArea displayArea;
 
 	// String representing the number that will be displayed by the calculator
 	private String displayNumber = "";
 
-	// Floats representing the numbers for the first and second operand
-	float firstValue = 0, secondValue = 0;
+	// Floats representing the numbers for the operands, and the final answer
+	float firstValue = 0, secondValue = 0, answer = 0;
 
 	// The current operator recorded by the calculator: default is none
 	private Operator currentOperator = Operator.NONE;
@@ -32,12 +32,13 @@ public class CalculatorGUI extends Application {
 	/* The possible states the calculator can have */
 
 	ReadingFirstState readingFirst = new ReadingFirstState();
-	ReadingSecondState readingSecond = new ReadingSecondState(); // IMPLEMENT
-	ErrorState error = new ErrorState(); // IMPLEMENT
+	ReadingSecondState readingSecond = new ReadingSecondState(); 
+	ErrorState error = new ErrorState(); 
 
 	// The initial state of the calculator is set to readingFirst
 	CalcState currentState = readingFirst;
 
+	//First State
 	public class ReadingFirstState implements CalcState {
 		@Override
 		public void updateNumber(int buttonNumber) {
@@ -49,20 +50,24 @@ public class CalculatorGUI extends Application {
 				firstValue = Float.parseFloat(displayNumber);
 				currentOperator = operator;
 				currentState = readingSecond;
-				displayNumber = ""; //reset display for 2nd operand
-				System.out.print("second state"); //FOR TESTING
-				System.out.print(firstValue); // FOR TESTING
-			} catch (NumberFormatException e) { // multiple decimal points
-				currentState = error; 
-				System.out.print("error"); // FOR TESTING
+				displayNumber = ""; // reset display for 2nd operand
+				
+				System.out.print("First Value Is: "); // FOR TESTING
+				System.out.println(firstValue); // FOR TESTING
+			} catch (NumberFormatException e) { // Multiple Decimal Point Error
+				currentState = error;
+				currentState.updateNumber(0);
+				System.out.println("Error"); // FOR TESTING
 			}
 		}
+
 		public void reset() {
-			firstValue = 0;
-			displayNumber = "";
+			//For the Clear Entry Button, only clears most recent input
+			displayNumber = ""; 
 		}
 	}
 
+	//Second State
 	public class ReadingSecondState implements CalcState {
 		@Override
 		public void updateNumber(int buttonNumber) {
@@ -70,67 +75,110 @@ public class CalculatorGUI extends Application {
 		}
 
 		public void operatorHit(Operator operator) {
-			float ans = 0;
 			try {
 				secondValue = Float.parseFloat(displayNumber);
-				System.out.print("second element state "); //FOR TESTING
-				System.out.println(secondValue); // FOR TESTING
-				if(operator.equals(Operator.EQUAL))
-				{
-					switch(currentOperator)
-					{
-					case DIVIDE: ans = firstValue / secondValue;
-					break;
-					case ADD: ans = firstValue + secondValue;
-					break;
-					case SUBTRACT: ans = firstValue - secondValue;
-					break;
-					case MULTIPLY: ans = firstValue * secondValue;
-					break;
+		
+				//If equals operand is hit 
+				if (operator.equals(Operator.EQUAL)) {
+					switch (currentOperator) {
+					case DIVIDE:
+						if (secondValue == 0) {
+							throw new ArithmeticException(); // Division by 0
+						} else {
+							answer = firstValue / secondValue;
+						}
+						break;
+					case ADD:
+						answer = firstValue + secondValue;
+						break;
+					case SUBTRACT:
+						answer = firstValue - secondValue;
+						break;
+					case MULTIPLY:
+						answer = firstValue * secondValue;
+						break;
 					default:
-					break;
+						break;
 					}
+
+					displayNumber = Float.toString(answer);
+					displayArea.setText(displayNumber);
+					currentState = readingFirst;
+					
+					System.out.print("The Final Answer Is: "); // FOR TESTING
+					System.out.println(displayNumber); // Test
+					
+				} else {
+					/*If any other operand is hit, current value is stored in
+					 * the first value variable. The state is then reset again
+					 * to the second state. This continues UNTIL the equals
+					 * operand is pressed
+					*/
+					switch (currentOperator) {
+					case DIVIDE:
+						if (secondValue == 0) {
+							throw new ArithmeticException(); // Division by 0
+						} else {
+							firstValue = firstValue / secondValue;
+						}
+						break;
+					case ADD:
+						firstValue = firstValue + secondValue;
+						break;
+					case SUBTRACT:
+						firstValue = firstValue - secondValue;
+						break;
+					case MULTIPLY:
+						firstValue = firstValue * secondValue;
+						break;
+					default:
+						break;
+					}
+					
+					currentOperator = operator;
+					currentState = readingSecond; //Reset back to start of 2nd 
+					displayNumber = ""; // reset display for next operand
+					
+					System.out.print("The Current Value Is: "); // FOR TESTING
+					System.out.println(firstValue); // Test
+					
+
 				}
-				System.out.println("after calc state "); //FOR TESTING
-				
-				Integer whole = 0;
-				if (ans % 1 == 0) // trying to drop decimal if ans is whole number
-				{
-					whole = (int) ans;
-					displayNumber = Integer.toString(whole);
-				}
-				else
-					displayNumber = Float.toString(ans);
-				
-				System.out.println(displayNumber); //Test
-				displayArea.setText(displayNumber);
-				
+
 			} catch (NumberFormatException e) { // multiple decimal points
-				currentState = error; 
-				System.out.print("error"); // FOR TESTING
+				currentState = error;
+				currentState.updateNumber(0);
+				System.out.println("Error"); // FOR TESTING
+			} catch (ArithmeticException e) { // multiple decimal points
+				currentState = error;
+				currentState.updateNumber(0);
+				System.out.println("Error"); // FOR TESTING
 			}
 		}
 
 		public void reset() {
-			secondValue = 0;
+			//For the Clear Entry Button, only clears most recent input
 			displayNumber = "";
 		}
 	}
 
-
+	//Error State
 	public class ErrorState implements CalcState { // IMPLEMENT
 		@Override
 		public void updateNumber(int buttonNumber) {
-			// IMPLEMENT
-			// IMPLEMENT
+			//Error is displayed until cleared
+			displayNumber = "ERROR";
+			displayArea.setText(displayNumber);
 		}
 
 		public void operatorHit(Operator operator) {
-			// IMPLEMENT
+			displayNumber = "ERROR";
+			displayArea.setText(displayNumber);
 		}
 
 		public void reset() {
-			// IMPLEMENT
+			//Clear Entry acts as a full clear here
+			resetAll();
 		}
 	}
 
@@ -142,28 +190,30 @@ public class CalculatorGUI extends Application {
 	private void resetAll() {
 		currentState = readingFirst;
 		displayNumber = "";
-		firstValue = 0; secondValue = 0;
+		firstValue = 0;
+		secondValue = 0;
+		answer = 0;
 		currentOperator = Operator.NONE;
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
-		//ints representing the size of the scene
+		// ints representing the size of the scene
 		int sceneWidth = 275, sceneHeight = 300;
 
 		// parameters for the HBox containing the buttons
 		int spaceBetweenNodes = 15; // space between each button
-		int paneBorderTop = 10, paneBorderRight = 20;  // top and right border
+		int paneBorderTop = 10, paneBorderRight = 20; // top and right border
 		int paneBorderBottom = 10, paneBorderLeft = 20; // left / bottom border
 
 		// parameters for the entire root BorderPane
-		int rootBorderTop = 0, rootBorderRight = 0;  // top and right border
+		int rootBorderTop = 0, rootBorderRight = 0; // top and right border
 		int rootBorderBottom = 0, rootBorderLeft = -130; // left/bottom border
 
 		// TextArea for the calculator display
 
-		displayArea = new TextArea(); 
+		displayArea = new TextArea();
 		displayArea.setEditable(false);
 		displayArea.setWrapText(true);
 		displayArea.setMaxHeight(50);
@@ -176,13 +226,13 @@ public class CalculatorGUI extends Application {
 		screen.setAlignment(Pos.TOP_CENTER);
 
 		/* BUTTON CREATION */
-		
-		/* Creating an HBox to contain the top row of calculator buttons*/
+
+		/* Creating an HBox to contain the top row of calculator buttons */
 
 		HBox topButtonsPane = new HBox(spaceBetweenNodes);
 		topButtonsPane.setAlignment(Pos.BOTTOM_CENTER);
 
-		topButtonsPane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
+		topButtonsPane.setPadding(new Insets(paneBorderTop, paneBorderRight,
 				paneBorderBottom, paneBorderLeft));
 
 		/* Adding the top buttons to the HBox */
@@ -199,14 +249,12 @@ public class CalculatorGUI extends Application {
 		Button divideButton = new Button("/");
 		topButtonsPane.getChildren().add(divideButton);
 
-
-		/* Creating an HBox to contain the buttons for 7, 8, and 9*/
+		/* Creating an HBox to contain the buttons for 7, 8, and 9 */
 
 		HBox sevenEightNinePane = new HBox(spaceBetweenNodes);
 		sevenEightNinePane.setAlignment(Pos.BOTTOM_CENTER);
 
-
-		sevenEightNinePane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
+		sevenEightNinePane.setPadding(new Insets(paneBorderTop, paneBorderRight,
 				paneBorderBottom, paneBorderLeft));
 
 		/* Adding the three buttons to the HBox */
@@ -226,13 +274,12 @@ public class CalculatorGUI extends Application {
 		Button timesButton = new Button("x");
 		sevenEightNinePane.getChildren().add(timesButton);
 
-
-		/* Creating an HBox to contain the buttons for 4, 5, and 6*/
+		/* Creating an HBox to contain the buttons for 4, 5, and 6 */
 
 		HBox fourFiveSixPane = new HBox(spaceBetweenNodes);
 		fourFiveSixPane.setAlignment(Pos.BOTTOM_CENTER);
 
-		fourFiveSixPane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
+		fourFiveSixPane.setPadding(new Insets(paneBorderTop, paneBorderRight,
 				paneBorderBottom, paneBorderLeft));
 
 		/* Adding the three buttons to the HBox */
@@ -252,12 +299,12 @@ public class CalculatorGUI extends Application {
 		Button minusButton = new Button("-");
 		fourFiveSixPane.getChildren().add(minusButton);
 
-		/* Creating an HBox to contain the buttons for 4, 5, and 6*/
+		/* Creating an HBox to contain the buttons for 4, 5, and 6 */
 
 		HBox oneTwoThreePane = new HBox(spaceBetweenNodes);
 		oneTwoThreePane.setAlignment(Pos.BOTTOM_CENTER);
 
-		oneTwoThreePane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
+		oneTwoThreePane.setPadding(new Insets(paneBorderTop, paneBorderRight,
 				paneBorderBottom, paneBorderLeft));
 
 		/* Adding the three buttons to the HBox */
@@ -277,12 +324,11 @@ public class CalculatorGUI extends Application {
 		Button plusButton = new Button("+");
 		oneTwoThreePane.getChildren().add(plusButton);
 
-
-		/* Creating an HBox to contain the two lower buttons*/
+		/* Creating an HBox to contain the two lower buttons */
 		HBox zeroAndDotPane = new HBox(spaceBetweenNodes);
 		zeroAndDotPane.setAlignment(Pos.BOTTOM_CENTER);
 
-		zeroAndDotPane.setPadding(new Insets(paneBorderTop, paneBorderRight, 
+		zeroAndDotPane.setPadding(new Insets(paneBorderTop, paneBorderRight,
 				paneBorderBottom, paneBorderLeft));
 
 		/* Adding the two buttons to the HBox */
@@ -301,8 +347,9 @@ public class CalculatorGUI extends Application {
 		zeroAndDotPane.getChildren().add(equalsButton);
 
 		/* BUTTON HANDLERS */
-		
-		/* Button handlers for the operand buttons are found below. Each button
+
+		/*
+		 * Button handlers for the operand buttons are found below. Each button
 		 * simply calls the operatorHit method in the current state
 		 */
 
@@ -322,6 +369,10 @@ public class CalculatorGUI extends Application {
 			currentState.operatorHit(Operator.DIVIDE);
 		});
 
+		equalsButton.setOnAction(e -> {
+			currentState.operatorHit(Operator.EQUAL);
+		});
+
 		/* Handler for the dot button */
 
 		dotButton.setOnAction(e -> {
@@ -329,7 +380,7 @@ public class CalculatorGUI extends Application {
 			displayArea.setText(displayNumber);
 		});
 
-		/*Handler for Inverse and SquareRoot buttons */
+		/* Handler for Inverse and SquareRoot buttons */
 
 		inverseButton.setOnAction(e -> {
 			float newNumber = 1f / (Float.parseFloat(displayNumber));
@@ -347,32 +398,31 @@ public class CalculatorGUI extends Application {
 		/* Clear and Clear Entry button handlers */
 
 		clearButton.setOnAction(e -> {
-			currentState.reset();
+			resetAll();
 			displayArea.setText(displayNumber);
 		});
 
 		clearEntryButton.setOnAction(e -> {
-			resetAll();
+			currentState.reset();
 			displayArea.setText(displayNumber);
 		});
 
 		// Creating vBox to hold the rows of buttons
 		VBox numberInputPane = new VBox();
 		numberInputPane.getChildren().addAll(topButtonsPane, sevenEightNinePane,
-				fourFiveSixPane,oneTwoThreePane, zeroAndDotPane);
-
+				fourFiveSixPane, oneTwoThreePane, zeroAndDotPane);
 
 		// A BorderPane is created to hold all the GUI elements
 		BorderPane root = new BorderPane();
-		root.setPadding(new Insets(rootBorderTop,rootBorderRight,
-				rootBorderBottom,rootBorderLeft));
+		root.setPadding(new Insets(rootBorderTop, rootBorderRight,
+				rootBorderBottom, rootBorderLeft));
 		root.setRight(null);
 		root.setLeft(null);
 
 		/* Display the stage */
 		root.setTop(screen);
 		root.setCenter(numberInputPane);
-		//root.setBottom(buttonPane);
+		// root.setBottom(buttonPane);
 
 		// Create the scene
 		Scene scene = new Scene(root, sceneWidth, sceneHeight);
@@ -388,7 +438,7 @@ public class CalculatorGUI extends Application {
 	private class NumberButtonHandler implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent e) {
-			processNumber((NumberButton)e.getSource());
+			processNumber((NumberButton) e.getSource());
 			displayArea.setText(displayNumber);
 		}
 	}
