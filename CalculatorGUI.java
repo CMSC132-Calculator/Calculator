@@ -70,7 +70,7 @@ public class CalculatorGUI extends Application {
 		}
 	}
 
-	//Second State
+	// State at which the calculator is reading the second operand
 	public class ReadingSecondState implements CalcState {
 		
 		@Override
@@ -78,6 +78,12 @@ public class CalculatorGUI extends Application {
 			displayNumber += buttonNumber;
 		}
 
+		/* The operatorHit method will yield the desired calculation depending
+		 * on the operator that was hit. An ArithmeticException is thrown if
+		 * the user attempts to divide by zero, and the state is changed to 
+		 * the error state. */
+		
+		@Override
 		public void operatorHit(Operator operator) {
 			try {
 				secondValue = Float.parseFloat(displayNumber);
@@ -142,21 +148,15 @@ public class CalculatorGUI extends Application {
 					currentOperator = operator;
 					currentState = readingSecond; //Reset back to start of 2nd 
 					displayNumber = ""; // reset display for next operand
-
-					System.out.print("The Current Value Is: "); // FOR TESTING
-					System.out.println(firstValue); // Test
-
-
 				}
 
 			} catch (NumberFormatException e) { // multiple decimal points
 				currentState = error;
 				currentState.updateNumber(0);
-				System.out.println("Error"); // FOR TESTING
+
 			} catch (ArithmeticException e) { // multiple decimal points
 				currentState = error;
 				currentState.updateNumber(0);
-				System.out.println("Error"); // FOR TESTING
 			}
 		}
 
@@ -166,7 +166,7 @@ public class CalculatorGUI extends Application {
 		}
 	}
 
-	//Error State
+	// Error State
 	public class ErrorState implements CalcState { // IMPLEMENT
 		@Override
 		public void updateNumber(int buttonNumber) {
@@ -176,6 +176,7 @@ public class CalculatorGUI extends Application {
 		}
 
 		public void operatorHit(Operator operator) {
+			//Error is displayed until cleared
 			displayNumber = "ERROR";
 			displayArea.setText(displayNumber);
 		}
@@ -186,11 +187,15 @@ public class CalculatorGUI extends Application {
 		}
 	}
 
+	/* Called whenever a NumberButton is pressed. */
+	
 	private void processNumber(NumberButton button) {
 		currentState.updateNumber(button.getValue());
 
 	}
 
+	/* Resets the entire program back to the initial state. */
+	
 	private void resetAll() {
 		currentState = readingFirst;
 		displayNumber = "";
@@ -392,8 +397,7 @@ public class CalculatorGUI extends Application {
 		/* The inverseButton handler simply returns the inverse of the
 		 * current display number. The handler will display the error status if
 		 * this button is pressed when there is no current number, or if the
-		 * current number is zero
-		 */
+		 * current number is zero */
 
 		inverseButton.setOnAction(e -> {
 
