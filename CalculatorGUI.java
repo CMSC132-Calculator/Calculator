@@ -24,43 +24,46 @@ public class CalculatorGUI extends Application {
 	private String displayNumber = "";
 
 	// Floats representing the numbers for the operands, and the final answer
-	float firstValue = 0, secondValue = 0, answer = 0;
+	private float firstValue = 0, secondValue = 0, answer = 0;
 
 	// The current operator recorded by the calculator: default is none
 	private Operator currentOperator = Operator.NONE;
 
 	/* The possible states the calculator can have */
-
-	ReadingFirstState readingFirst = new ReadingFirstState();
-	ReadingSecondState readingSecond = new ReadingSecondState(); 
-	ErrorState error = new ErrorState(); 
+	private ReadingFirstState readingFirst = new ReadingFirstState();
+	private ReadingSecondState readingSecond = new ReadingSecondState(); 
+	private ErrorState error = new ErrorState(); 
 
 	// The initial state of the calculator is set to readingFirst
-	CalcState currentState = readingFirst;
+	private CalcState currentState = readingFirst;
 
-	//First State
+	// State at which the calculator is reading the first operand
 	public class ReadingFirstState implements CalcState {
+		
 		@Override
 		public void updateNumber(int buttonNumber) {
-			displayNumber += buttonNumber;
+			displayNumber += buttonNumber; 
 		}
 
+		/* When an operator is hit in the first state, the parsed value of the
+		 * display number will be stored as the first value. The current state
+		 * is now readingSecond, and the display is reset. If the display is
+		 * not a valid number, the currentState is set to error. */
+		
+		@Override 
 		public void operatorHit(Operator operator) {
 			try {
 				firstValue = Float.parseFloat(displayNumber);
 				currentOperator = operator;
 				currentState = readingSecond;
-				displayNumber = ""; // reset display for 2nd operand
-
-				System.out.print("First Value Is: "); // FOR TESTING
-				System.out.println(firstValue); // FOR TESTING
+				reset(); // reset display for 2nd operand
 			} catch (NumberFormatException e) { // Multiple Decimal Point Error
 				currentState = error;
 				currentState.updateNumber(0);
-				System.out.println("Error"); // FOR TESTING
 			}
 		}
-
+		
+		@Override
 		public void reset() {
 			//For the Clear Entry Button, only clears most recent input
 			displayNumber = ""; 
@@ -69,6 +72,7 @@ public class CalculatorGUI extends Application {
 
 	//Second State
 	public class ReadingSecondState implements CalcState {
+		
 		@Override
 		public void updateNumber(int buttonNumber) {
 			displayNumber += buttonNumber;
@@ -210,14 +214,17 @@ public class CalculatorGUI extends Application {
 		// parameters for the entire root BorderPane
 		int rootBorderTop = 0, rootBorderRight = 0; // top and right border
 		int rootBorderBottom = 0, rootBorderLeft = -130; // left/bottom border
+		
+		// parameters for the height and width of the display
+		int maxDisplayHeight = 50, maxDisplayWidth = 200;
 
 		// TextArea for the calculator display
 
 		displayArea = new TextArea();
 		displayArea.setEditable(false);
 		displayArea.setWrapText(true);
-		displayArea.setMaxHeight(50);
-		displayArea.setMaxWidth(200);
+		displayArea.setMaxHeight(maxDisplayHeight);
+		displayArea.setMaxWidth(maxDisplayWidth);
 
 		// Creates a FlowPane to contain the displayArea
 
