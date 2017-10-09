@@ -115,9 +115,6 @@ public class CalculatorGUI extends Application {
 					displayArea.setText(displayNumber);
 					currentState = readingFirst;
 
-					System.out.print("The Final Answer Is: "); // FOR TESTING
-					System.out.println(displayNumber); // Test
-
 				} else {
 					/*If any other operand is hit, current value is stored in
 					 * the first value variable. The state is then reset again
